@@ -9,9 +9,9 @@ Single Page Applications, JAM Stack, Headless - the features these architectures
 With all the buzz-words and feature/benefit oriented discussion at some point we thought: there is too little discussion about the best practices. Especially regarding the Security.
 The frontend applications are very often developed by the frontend-teams that **didn't have to** to worry so much about the security and security before. With this paradigm shift - more and more business logick - especially including integrations with third party systems is taking place in the frontend. 
 
-The times where you needed to worry about SQL Injection are probably gone. Now you query some API from Amazon, Azure, Firebase, ELastic or MongoDB. No problem. However there is whole set of new issues and vulnerabilities we need to aware off. Including - API authorization, session handling, exposing unahtorized data, SSR caching and so on.
+The times where you needed to worry about SQL Injection are probably gone. Now you query some API from Amazon, Azure, Firebase, Elastic or MongoDB. No problem. However there is whole set of new issues and vulnerabilities we need to aware off. Including - API authorization, session handling, exposing sensitive information, SSR caching and so on.
 
-This repository and e-book is all about it. To show the best practices how to secure your API-first/Headless applications. It's been started by <a href="https://vuestorefront.io">Vue Storefront Community</a> and we hope it will be continued by the contributors. We'd like to gather the best practices from many different Open Source project in one single place with actionable examples of DO's and DON'T. [Everyone is invited to contribute](CONTRIBUTING.md)!
+This repository and e-book is all about it. To show the best practices how to secure your API-first/Headless applications. It's been started by <a href="https://vuestorefront.io">Vue Storefront Community</a> and we hope it will be continued by the contributors. We'd like to gather the best practices from many different Open Source project in one single place with actionable examples of DO's and DONT's. [Everyone is invited to contribute](CONTRIBUTING.md)!
 
 
 ## About the authors
