@@ -1,10 +1,10 @@
 # VSF1 Best Practices
 
-[Vue Storefront 1](https://github.com/DivanteLtd/vue-storefront) become a pretty popular frontend framework for building modern eCommerce sites. The number of features, configuration and deployment options is only growing. With a great flexibility there comes responsibility too. Here you can find some Best Practices and Security Standards for building [custom VSF modules](https://docs.vuestorefront.io/guide/cookbook/module.html) and [deploying the sites to production](https://docs.vuestorefront.io/guide/installation/production-setup.html).
+[Vue Storefront 1](https://github.com/DivanteLtd/vue-storefront) become a pretty popular frontend framework for building modern eCommerce sites. The number of features, configuration and deployment options is only growing. With great flexibility there comes responsibility too. Here you can find some Best Practices and Security Standards for building [custom VSF modules](https://docs.vuestorefront.io/guide/cookbook/module.html) and [deploying the sites to production](https://docs.vuestorefront.io/guide/installation/production-setup.html).
 
 ## Config file is public
 
-Vue Storefront uses [node-config](https://github.com/lorenwest/node-config) for managing it's [configuration files](https://docs.vuestorefront.io/guide/basics/configuration.html). As powerful this library is - we must remember that VSF works in both CSR/SPA (Client Side Rendering/Single Page Application) and SSR (Server Side Rendering) modes using **exactly the same codebase**. This means that the `config/*.json` files are **all bundled within Webpack** and sent to the user browser to be accesible from the JavaScript code executed in SPA mode.
+Vue Storefront uses [node-config](https://github.com/lorenwest/node-config) for managing it's [configuration files](https://docs.vuestorefront.io/guide/basics/configuration.html). As powerful this library is - we must remember that VSF works in both CSR/SPA (Client-Side Rendering/Single Page Application) and SSR (Server Side Rendering) modes using **exactly the same codebase**. This means that the `config/*.json` files are **all bundled within Webpack** and sent to the user browser to be accessible from the JavaScript code executed in SPA mode.
 
 This is how your config file looks in the Client's browser (as a part of the `app.*.js` bundle):
 
@@ -29,7 +29,7 @@ Even more extreme case would be sharing the Payment's provider authorization key
 
 ### Use `dynamicConfigExclude` properly
 
-This feature let you to [prevent some config properties](https://docs.vuestorefront.io/guide/basics/configuration.html#server) from being transfered within the `__INITIAL_STATE__` - so they won't be visible anymore in the `View Source` mode of your page. However, these properties **are still there in the `app.js` bundle**
+This feature let you to [prevent some config properties](https://docs.vuestorefront.io/guide/basics/configuration.html#server) from being transferred within the `__INITIAL_STATE__` - so they won't be visible anymore in the `View Source` mode of your page. However, these properties **are still there in the `app.js` bundle**
 
 ### Use the `purge-config` loader
 
@@ -63,11 +63,11 @@ User related data - by default - is never processed in the Vue Storefront SSR re
 
 It's fairly easy to cache the user-related, sensitive information in the output cache by accident - if you processed the user-related info server side. Please don't do this.
 
-The `user` module by default is not supporting the `isServer` option, the whole `MyAccount` section is even redirecting the requests to home page when entered SSR. The authorization module is based on the `localStorage` where the user token is stored after a successfull authorization and then passed out to all subsequent `vue-storefront-api` or `storefront-api` requests.
+The `user` module by default is not supporting the `isServer` option, the whole `MyAccount` section is even redirecting the requests to home page when entered SSR. The authorization module is based on the `localStorage` where the user token is stored after a successful authorization and then passed out to all subsequent `vue-storefront-api` or `storefront-api` requests.
 
 ## Always use the HTTP proxy 
 
-Vue Storefront runs (by default) on the port `3000` and the API is exposed on `8080`. Never route a production traffic to these ports. Node.js HTTP Servers (used by `vue-storefront`) are not meant to be used on production. By many different reasons - including scalability, throthling, process management and of course security. You always should use HTTP Proxy like `nginx` or `varnish` in front of both: frontend and API services.
+Vue Storefront runs (by default) on the port `3000` and the API is exposed on `8080`. Never route production traffic to these ports. Node.js HTTP Servers (used by `vue-storefront`) are not meant to be used on production. By many different reasons - including scalability, throttling, process management and of course security. You always should use HTTP Proxy like `nginx` or `varnish` in front of both: frontend and API services.
 
 Here you've got a short tutorial on [how to properly setup VSF with nginx](https://docs.vuestorefront.io/guide/installation/production-setup.html#production-setup-bare-vps)
 
@@ -77,7 +77,7 @@ This advise is especially important for Magento1 which has just ended it life Ju
 
 All the requests Vue Storefront is making to the Magento APIs are **always proxied** via `vue-storefront-api` or the `storefront-api`. Only these apps need to contact Magento directly. 
 There could be one distinction of this rule when you're using Magento Checkout Fallback - so the whole frontend is on Vue Storefront, but the checkout is still processed by Magento itself. 
-In that case you could modify the `.htaccess` file on your Magento instance to prevent requests others than to the `/checkout` url schema.
+In that case you could modify the `.htaccess` file on your Magento instance to prevent requests others than to the `/checkout` URL schema.
 
 If you're using `nginx` as your HTTP Proxy you can do this using the [access module](http://nginx.org/en/docs/http/ngx_http_access_module.html). 
 
