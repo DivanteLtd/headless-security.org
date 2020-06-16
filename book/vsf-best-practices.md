@@ -22,6 +22,11 @@ Moreover, if the `dynamicConfigReload` option is on (and it's enabled by default
 
 **Never put any sensitive information** in the configuration file. Especially please don't put any **shared authorization tokens** neither **private keys** in the config files. As convenient and tempting it might be - it's far better to use the `ENV` variables (accessible only from the [server side modules](https://github.com/DivanteLtd/vue-storefront/blob/master/src/modules/google-cloud-trace/server.ts)), another configuration file which won't be included in the CSR code so Webpack won't bundle it in.
 
+**Example:**
+A classical example of a **bad practice** regarding the config file would be a dedicated feature for saving Contact forms into Zendesk. To send the contact request you'll need to have a Zendesk API token and use it along with `fetch()` call when  the user submits the contact form. This request never should be executed directly from the frontend, because sharing Zendesk API token gives much more permissions than only submitting new forms (eg. you can get the history of the requests etc).
+
+Even more extreme case would be sharing the Payment's provider authorization keys (including secret/private keys). These keys are usually required for signing off/validating the payment status changes and never should be exposed out of the `vue-storefront-api` or `storefront-api`. Please make sure the module you're using uses only the public API keys in the `vue-storefront` frontend layer for integration.
+
 ### Use `dynamicConfigExclude` properly
 
 This feature let you to [prevent some config properties](https://docs.vuestorefront.io/guide/basics/configuration.html#server) from being transfered within the `__INITIAL_STATE__` - so they won't be visible anymore in the `View Source` mode of your page. However, these properties **are still there in the `app.js` bundle**
@@ -52,10 +57,31 @@ There are two exceptions from this general rule:
 - if the API key is public (eg. it let the user to query only the public information - for example product catalog),
 - if there is a dynamic API key / JWT Token / any other form of token which is acquired by the user from the authorization service based on the credentials provided by the user (eg. password/login). This token of course won't be stored in the config file. This is how the Vue Storefront [passes the user tokens](https://github.com/DivanteLtd/vue-storefront/blob/dfdb9f5264d2ca08aaad7281843cd4eda643ef2b/core/lib/sync/task.ts#L55) for the requests like `order-history`.
 
-## Don't process user-related information in the SSR
+## Don't process any user-related information in the SSR
 
 User related data - by default - is never processed in the Vue Storefront SSR rendering mode. SSR output is a subject of [output caching](https://docs.vuestorefront.io/guide/cookbook/checklist.html#_2-ssr-output-cache) and because the application is **session-less by design**. We're not using cookies neither any other form of server session. The Server Side generated output must be always user-agnostic serving only public information that could be indexed by the crawlers and in general being shared between the users.
 
 It's fairly easy to cache the user-related, sensitive information in the output cache by accident - if you processed the user-related info server side. Please don't do this.
 
-The `user` module by default is not supporting `isServer` option, the whole `MyAccount` section is even redirecting the requests to home page when entered SSR. The authorization module is based on the `localStorage` where the user token is stored after successfull authorization and then passed out to all subsequent `vue-storefront-api` or `storefront-api` requests.
+The `user` module by default is not supporting the `isServer` option, the whole `MyAccount` section is even redirecting the requests to home page when entered SSR. The authorization module is based on the `localStorage` where the user token is stored after a successfull authorization and then passed out to all subsequent `vue-storefront-api` or `storefront-api` requests.
+
+## Always use the HTTP proxy 
+
+Vue Storefront runs (by default) on the port `3000` and the API is exposed on `8080`. Never route a production traffic to these ports. Node.js HTTP Servers (used by `vue-storefront`) are not meant to be used on production. By many different reasons - including scalability, throthling, process management and of course security. You always should use HTTP Proxy like `nginx` or `varnish` in front of both: frontend and API services.
+
+Here you've got a short tutorial on [how to properly setup VSF with nginx](https://docs.vuestorefront.io/guide/installation/production-setup.html#production-setup-bare-vps)
+
+## Don't expose Magento frontend 
+
+This advise is especially important for Magento1 which has just ended it life June 2020. Keeping the non-maintained piece of software is never a good idea. If you've got your frontend on Vue Storefront they you probably don't need to expose any other part of Magento to the public internet.
+
+All the requests Vue Storefront is making to the Magento APIs are **always proxied** via `vue-storefront-api` or the `storefront-api`. Only these apps need to contact Magento directly. 
+There could be one distinction of this rule when you're using Magento Checkout Fallback - so the whole frontend is on Vue Storefront, but the checkout is still processed by Magento itself. 
+In that case you could modify the `.htaccess` file on your Magento instance to prevent requests others than to the `/checkout` url schema.
+
+If you're using `nginx` as your HTTP Proxy you can do this using the [access module](http://nginx.org/en/docs/http/ngx_http_access_module.html). 
+
+## Change the `invalidateCacheKey`
+
+Ok, this is minor severity advice. If you're using the SSR cache, then please change the [`invalidateCacheKey`](https://docs.vuestorefront.io/guide/basics/ssr-cache.html#dynamic-tags). Otherwise anyone can clear-out your output cache (stored in Redis) by just calling out the `https://yourdomain.com/invalidate?tag=*&key=aeSu7aip`, including the default `invalidateCacheKey`.
+
