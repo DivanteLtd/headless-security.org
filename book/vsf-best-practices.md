@@ -45,6 +45,10 @@ Webpack filters are pretty powerful in regards of composing the resulting JS bun
       }
 ```
 
+### Use the Yireo config validator 
+
+This validation script can help you to make sure your VSF instance is properly configured with Magento, and there are plans to add some security validation checks as well. Check the details at [Yireo Github repository](https://github.com/yireo/vsf-config-validator)
+
 ## Use the API to query authorized data sources
 
 The config file [embeded within `vue-storefront`](https://github.com/DivanteLtd/vue-storefront/tree/master/config) is publicly available to the users. However, the config files used by [`vue-storefront-api`](https://github.com/DivanteLtd/vue-storefront-api/tree/master/config) or [`storefront-api`](https://github.com/DivanteLtd/storefront-api/tree/master/config) **are secret**. They're guaranteed not to be served to the client devices in any form.
@@ -84,4 +88,72 @@ If you're using `nginx` as your HTTP Proxy you can do this using the [access mod
 ## Change the `invalidateCacheKey`
 
 Ok, this is minor severity advice. If you're using the SSR cache, then please change the [`invalidateCacheKey`](https://docs.vuestorefront.io/guide/basics/ssr-cache.html#dynamic-tags). Otherwise anyone can clear-out your output cache (stored in Redis) by just calling out the `https://yourdomain.com/invalidate?tag=*&key=aeSu7aip`, including the default `invalidateCacheKey`.
+
+## Secure your sandbox/dev env.
+
+Many times you'd like to have a development instance of Vue Storefront exposed publicly so you could share the link with the clients/developers etc. It's a good practice to secure such an instance with a password, VPN etc. Here's the easiest way to run VSF password protected.
+
+We strongly recommend using a kind of HTTP server as the proxy in front of Vue Storefront. Let it be `nginx` (suggested in our [production setup docs](https://docs.vuestorefront.io/guide/installation/production-setup.html)) or `Varnish` or even `Apache`. Any of those HTTP servers allows you to add some authorization or redirects layer before Vue Storefront.
+
+This is a recommended way.
+
+## Add custom Express.js routes to fetch sensitive data
+
+As described above you might want to fetch the data from 3rd party/authorized data sources using `vue-storefront-api` or `storefront-api` custom extensions/modules. There is another way - adding server-middlewares directly within the `vue-storefront` application.
+
+### Express.js middelware
+
+This other option is to create a `Express.js` middleware. Our `core/scripts/server.ts` is a classical Node.js application so it should be easy. To do so you might want to create a [server module](https://github.com/DivanteLtd/vue-storefront/blob/develop/src/modules/compress/server.ts).
+
+Server modules are located in `src/modules` and always have the `server.ts` entry point which responds to one of the few server entry points:
+
+- `afterProcessStarted` - executed just [after the server started](https://github.com/DivanteLtd/vue-storefront/blob/2c6e0e1c8e73952beabf550fe4530344a6bcce15/core/scripts/server.ts#L13).
+- `afterApplicationInitialized` - executed just [after Express app got initialized](https://github.com/DivanteLtd/vue-storefront/blob/2c6e0e1c8e73952beabf550fe4530344a6bcce15/core/scripts/server.ts#L34). It's a good entry point to bind new request handlers (`app.get(...)`, `app.use(...)`). Read more on [Express.js request handlers and routing](https://expressjs.com/en/guide/routing.html).
+- `beforeOutputRenderedResponse` - executed [after the SSR rendering has been done](https://github.com/DivanteLtd/vue-storefront/blob/2c6e0e1c8e73952beabf550fe4530344a6bcce15/core/scripts/server.ts#L189) but before sending it out to the browser; It lets you override the rendered SSR content with your own.
+- `afterOutputRenderedResponse` - executed [after advanced output processing pipeline](https://github.com/DivanteLtd/vue-storefront/blob/2c6e0e1c8e73952beabf550fe4530344a6bcce15/core/scripts/server.ts#L212) executed.
+- `beforeCacheInvalidated`, `afterCacheInvalidated` - executed [before and after cache has been invalidated](https://github.com/DivanteLtd/vue-storefront/blob/2c6e0e1c8e73952beabf550fe4530344a6bcce15/core/scripts/server.ts#L76)
+
+Here is an [example how to bind](https://github.com/DivanteLtd/vue-storefront/blob/develop/src/modules/google-cloud-trace/server.ts) tracing module just after server process started:
+
+```js
+import { serverHooks } from '@vue-storefront/core/server/hooks'
+
+serverHooks.afterProcessStarted((config) => {
+  let trace = require('@google-cloud/trace-agent')
+  if (config.has('trace') && config.get('trace.enabled')) {
+    trace.start(config.get('trace.config'))
+  }
+})
+```
+
+[Another example](https://github.com/DivanteLtd/vue-storefront/blob/develop/src/modules/compress/server.ts) - pretty common case - binding new Express middleware to process all user requests BEFORE they're processed by SSR rendering pipeline (including custom URL addresses):
+
+```js
+import { serverHooks } from '@vue-storefront/core/server/hooks'
+
+const compression = require('compression')
+serverHooks.afterApplicationInitialized(({ app, isProd }) => {
+  if (isProd) {
+    console.log('Output Compression is enabled')
+    app.use(compression({ enabled: isProd }))
+  }
+})
+```
+
+If you'd like to bind custom URL address this example can be modified like this:
+
+```js
+import { serverHooks } from '@vue-storefront/core/server/hooks'
+
+serverHooks.afterApplicationInitialized(({ app, isProd }) => {
+  app.get('/custom-url-address', (req, res) => {
+    res.end('Custom response')
+  })
+})
+```
+### Advanced output processing
+
+However, by using [advanced output processing](https://docs.vuestorefront.io/guide/core-themes/layouts.html#how-it-works) you can easily generate any text data output from your Vue Storefront site you want. Including JSON, XML and others. It's a way to generate sitemaps and other data-based documents.
+
+
 
