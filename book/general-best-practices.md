@@ -21,3 +21,11 @@ The OAuth standard works pretty similarly to OpenID. The authorization provider 
 When your APIs are deployed on the same domain as the frontend - there is no problem fetching the data. Usually though you're in a case when you're making the request to 3rd party service or just a different microservice within your K8s/cloud stack. In that case make sure you've got the CORS headers properly set. CORS headers control [who can request the data (which domains)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) and can be used to limit the scope of these requests.
 
 **Note:** The CORS headers are being controlled by the browser. It's not a valid solution for preventing the data access/requests server-side.
+
+## Set proper Referrer-Policy HTTP header
+
+You will for sure us Third Parties marketing tools as Google Analytics, Google Tag Manager, Facebook, Criteo.
+
+In order to prevent cart or session tokens present in your application URL to be leaked, please setup your Referrer Policy with the correct one.
+
+[Read more about Referrer-Policy] (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy)
