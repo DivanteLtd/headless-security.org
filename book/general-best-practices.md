@@ -28,4 +28,4 @@ You will for sure us Third Parties marketing tools as Google Analytics, Google T
 
 In order to prevent cart or session tokens present in your application URL to be leaked, please setup your Referrer Policy with the correct one.
 
-[Read more about Referrer-Policy] (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy)
+[Read more about Referrer-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy)
