@@ -49,6 +49,14 @@ Webpack filters are pretty powerful in regards of composing the resulting JS bun
 
 This validation script can help you to make sure your VSF instance is properly configured with Magento, and there are plans to add some security validation checks as well. Check the details at [Yireo Github repository](https://github.com/yireo/vsf-config-validator)
 
+## Use the `search-query` search adapter
+
+From Vue Storefront 1.12 on there is a [new `search-query` search adapter](https://github.com/DivanteLtd/vue-storefront-api/pull/390/files#diff-1c1dccf8e51ee40b3321b647cee837b8R56). The goal for introducing this new adapter was mostly to a) limit the bundle size and remove the business logic of constructing Elastic Search DSL queries in the frontend app, b) limit and control the way people are querying the ElasticSearch by giving them just a subset of operators defined within our own DSL defined in the [`storefront-query-builder`](https://github.com/DivanteLtd/storefront-query-builder). By setting the `config.api` to `search-query` you're virtually removing the ElasticSearch DSL query building in the frontend. 
+
+**Note:** By switching this option in the frontend you're not **disabling** an option of switching the Elastic DSL engine in the `vue-storefront-api`. Please look at [this feature-request](https://github.com/DivanteLtd/vue-storefront-api/issues/487) in order to disable other query engines at the backend.
+
+**Note:** If by some reasons you can't use `search-query` search adapter (eg. you're on VSF 1.10 or so) please look at this PoC of [limiting the Elastic DSL query ranges](https://github.com/DivanteLtd/vue-storefront-api/issues/486).
+
 ## Use the API to query authorized data sources
 
 The config file [embeded within `vue-storefront`](https://github.com/DivanteLtd/vue-storefront/tree/master/config) is publicly available to the users. However, the config files used by [`vue-storefront-api`](https://github.com/DivanteLtd/vue-storefront-api/tree/master/config) or [`storefront-api`](https://github.com/DivanteLtd/storefront-api/tree/master/config) **are secret**. They're guaranteed not to be served to the client devices in any form.
