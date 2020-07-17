@@ -105,6 +105,10 @@ We strongly recommend using a kind of HTTP server as the proxy in front of Vue S
 
 This is a recommended way.
 
+## Consider adding the token-based authorization for catalog requests
+
+All the write/user-sensitive operation are secured with token-based authorization in Vue Storefront. The catalog requests are open (via `vue-storefront-api` that can be used for limiting the data access, filtering etc). It might be worth considering the token-based, anti-csrf kind of authorization for catalog requests as well. It will let you easier control, throttle and limit the API request. That might be pretty usefull when not using the external WAF (Web Application Firewall) and still needing to implement some kind of anti-scrapping protection. I've desribed how it can work in the [`vue-storefront#4624`](https://github.com/DivanteLtd/vue-storefront/issues/4624)
+
 ## Add custom Express.js routes to fetch sensitive data
 
 As described above you might want to fetch the data from 3rd party/authorized data sources using `vue-storefront-api` or `storefront-api` custom extensions/modules. There is another way - adding server-middlewares directly within the `vue-storefront` application.
