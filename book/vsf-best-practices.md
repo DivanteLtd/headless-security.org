@@ -109,6 +109,12 @@ This is a recommended way.
 
 All the write/user-sensitive operation are secured with token-based authorization in Vue Storefront. The catalog requests are open (via `vue-storefront-api` that can be used for limiting the data access, filtering etc). It might be worth considering the token-based, anti-csrf kind of authorization for catalog requests as well. It will let you easier control, throttle and limit the API request. That might be pretty usefull when not using the external WAF (Web Application Firewall) and still needing to implement some kind of anti-scrapping protection. I've desribed how it can work in the [`vue-storefront#4624`](https://github.com/DivanteLtd/vue-storefront/issues/4624)
 
+## Consider using WAF (Web Application Firewall)
+
+It's usually a great idea to use an external line of control/filtering over your web application. [Web Application Firewalls are just about it](https://owasp.org/www-community/Web_Application_Firewall). You might find a whole variety of different on-prem and cloud solutions like AWS WAF, Fortinet, [Nginx WAF](https://docs.nginx.com/nginx-waf/) and others. You can give it a try to open source [ModSecurity](https://github.com/spiderlabs/modsecurity/) as well.
+
+Because `vue-storefront` and `vue-storefront-api` are both based on Express.js some features like [request-throttling](https://www.npmjs.com/package/express-throttle) can be implemented by using just some [Express middlewares](https://expressjs.com/en/advanced/best-practice-security.html).
+
 ## Add custom Express.js routes to fetch sensitive data
 
 As described above you might want to fetch the data from 3rd party/authorized data sources using `vue-storefront-api` or `storefront-api` custom extensions/modules. There is another way - adding server-middlewares directly within the `vue-storefront` application.
