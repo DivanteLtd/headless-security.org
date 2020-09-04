@@ -109,6 +109,10 @@ This is a recommended way.
 
 All the write/user-sensitive operation are secured with token-based authorization in Vue Storefront. The catalog requests are open (via `vue-storefront-api` that can be used for limiting the data access, filtering etc). It might be worth considering the token-based, anti-csrf kind of authorization for catalog requests as well. It will let you easier control, throttle and limit the API request. That might be pretty usefull when not using the external WAF (Web Application Firewall) and still needing to implement some kind of anti-scrapping protection. I've desribed how it can work in the [`vue-storefront#4624`](https://github.com/DivanteLtd/vue-storefront/issues/4624)
 
+## Use `users.tokenInHeader` option for request authorization
+
+Check if you've got the `config.users.tokenInHeader` option enabled. It's been introduced with the [PR4626](https://github.com/DivanteLtd/vue-storefront/pull/4626) and let the authroization tokens to be passed via the `Bearer: ` header instead of the `GET` variable. Passing the tokens via HTTP Headers is generally a good practice as they're not recorded within the server access logs that way.
+
 ## Consider using WAF (Web Application Firewall)
 
 It's usually a great idea to use an external line of control/filtering over your web application. [Web Application Firewalls are just about it](https://owasp.org/www-community/Web_Application_Firewall). You might find a whole variety of different on-prem and cloud solutions like AWS WAF, Fortinet, [Nginx WAF](https://docs.nginx.com/nginx-waf/) and others. You can give it a try to open source [ModSecurity](https://github.com/spiderlabs/modsecurity/) as well.

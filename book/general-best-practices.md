@@ -20,6 +20,8 @@ The OAuth standard works pretty similarly to OpenID. The authorization provider 
 
 Most of the Headless frontends are based on Express.js HTTP server. Including `vue-storefront` and `vue-storefront-api` as well. Please make sure you follow the [Express.js Security Best Practices](https://expressjs.com/en/advanced/best-practice-security.html). There are great modules like [helmet](https://www.npmjs.com/package/helmet) available out of the box that can be super-easily installed into your frontend app.
 
+Refernce: The [PR#4626](https://github.com/DivanteLtd/vue-storefront/pull/4626) introduces helmet module to the VSF1 frontend.
+
 ## Set proper CORS headers
 
 When your APIs are deployed on the same domain as the frontend - there is no problem fetching the data. Usually though you're in a case when you're making the request to 3rd party service or just a different microservice within your K8s/cloud stack. In that case make sure you've got the CORS headers properly set. CORS headers control [who can request the data (which domains)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) and can be used to limit the scope of these requests.
