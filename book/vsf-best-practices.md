@@ -123,7 +123,7 @@ Because `vue-storefront` and `vue-storefront-api` are both based on Express.js s
 
 As described above you might want to fetch the data from 3rd party/authorized data sources using `vue-storefront-api` or `storefront-api` custom extensions/modules. There is another way - adding server-middlewares directly within the `vue-storefront` application.
 
-### Express.js middelware
+### Express.js middleware
 
 This other option is to create a `Express.js` middleware. Our `core/scripts/server.ts` is a classical Node.js application so it should be easy. To do so you might want to create a [server module](https://github.com/DivanteLtd/vue-storefront/blob/develop/src/modules/compress/server.ts).
 
